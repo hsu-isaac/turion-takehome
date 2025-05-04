@@ -1,0 +1,59 @@
+version: "3.8"
+
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg14
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=telemetry
+    ports:
+      - "5433:5432"
+    volumes:
+      - timescaledb_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  telemetry-ingest:
+    build:
+      context: ./telemetry-ingest
+      dockerfile: Dockerfile
+    environment:
+      - DB_HOST=timescaledb
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=telemetry
+    ports:
+      - "8089:8089/udp"
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+
+  telemetry-api:
+    build:
+      context: ./telemetry-api
+      dockerfile: Dockerfile
+    environment:
+      - DB_HOST=timescaledb
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=telemetry
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+
+  telemetry-generator:
+    build:
+      context: ./telemetry-generator
+      dockerfile: Dockerfile
+    depends_on:
+      - telemetry-ingest
+
+volumes:
+  timescaledb_data:
