@@ -48,6 +48,19 @@ services:
       timescaledb:
         condition: service_healthy
 
+  telemetry-frontend:
+    build:
+      context: ./telemetry-frontend
+      dockerfile: Dockerfile
+    environment:
+      - REACT_APP_API_URL=http://localhost:3000/api/v1
+      - REACT_APP_WS_URL=ws://localhost:3000/ws
+      - PORT=3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      - telemetry-api
+
   telemetry-generator:
     build:
       context: ./telemetry-generator

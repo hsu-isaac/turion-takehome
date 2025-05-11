@@ -59,7 +59,6 @@ func main() {
 	})
 	api.Get("/telemetry/current", h.GetCurrentTelemetry)
 	api.Get("/telemetry/anomalies", h.GetAnomalies)
-	api.Get("/telemetry/aggregates", h.GetAggregates)
 
 	app.Use("/ws", func(c *fiber.Ctx) error {
 		if websocket.IsWebSocketUpgrade(c) {

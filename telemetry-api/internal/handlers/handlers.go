@@ -16,10 +16,7 @@ func NewHandlers(db *database.Database) *Handlers {
 }
 
 func (h *Handlers) GetTelemetry(c *fiber.Ctx) error {
-	query := &models.TelemetryQuery{
-		Page:     1,   // Set default values
-		PageSize: 100, // Set default values
-	}
+	query := &models.TelemetryQuery{} // Initialize empty query
 
 	if err := c.QueryParser(query); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -33,11 +30,12 @@ func (h *Handlers) GetTelemetry(c *fiber.Ctx) error {
 		})
 	}
 
+	// Only set defaults if not provided or invalid
 	if query.Page <= 0 {
 		query.Page = 1
 	}
 	if query.PageSize <= 0 {
-		query.PageSize = 100
+		query.PageSize = 20
 	}
 
 	// Set default subsystem ID if not provided
@@ -86,10 +84,7 @@ func (h *Handlers) GetCurrentTelemetry(c *fiber.Ctx) error {
 }
 
 func (h *Handlers) GetAnomalies(c *fiber.Ctx) error {
-	query := &models.TelemetryQuery{
-		Page:     1,   // Set default values
-		PageSize: 100, // Set default values
-	}
+	query := &models.TelemetryQuery{} // Initialize empty query
 
 	if err := c.QueryParser(query); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -103,11 +98,12 @@ func (h *Handlers) GetAnomalies(c *fiber.Ctx) error {
 		})
 	}
 
+	// Only set defaults if not provided or invalid
 	if query.Page <= 0 {
 		query.Page = 1
 	}
 	if query.PageSize <= 0 {
-		query.PageSize = 100
+		query.PageSize = 20
 	}
 
 	// Set default subsystem ID if not provided
@@ -142,29 +138,4 @@ func (h *Handlers) GetAnomalies(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(response)
-}
-
-func (h *Handlers) GetAggregates(c *fiber.Ctx) error {
-	query := new(models.TelemetryAggregationQuery)
-
-	if err := c.QueryParser(query); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid query parameters",
-		})
-	}
-
-	metrics, err := h.db.GetAggregatedTelemetry(query)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to fetch aggregated telemetry",
-		})
-	}
-
-	return c.JSON(fiber.Map{
-		"data": metrics,
-		"time_range": models.TimeRange{
-			Start: query.StartTime,
-			End:   query.EndTime,
-		},
-	})
 }
