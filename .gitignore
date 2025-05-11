@@ -1,0 +1,17 @@
+# Go Backend
+*.exe
+*.exe~
+*.test
+*.out
+bin/
+dist/
+
+# Environment files
+.env
+
+# React/TypeScript Frontend
+# Dependencies
+node_modules/
+
+# TypeScript
+*.tsbuildinfo
