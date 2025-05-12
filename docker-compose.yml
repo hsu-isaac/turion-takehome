@@ -17,6 +17,20 @@ services:
       timeout: 5s
       retries: 5
 
+  db-migrate:
+    build:
+      context: ./telemetry-ingest
+      dockerfile: Dockerfile
+    command: ["./migrate", "-up"]
+    environment:
+      - DB_HOST=timescaledb
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=telemetry
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+
   telemetry-ingest:
     build:
       context: ./telemetry-ingest
@@ -29,6 +43,8 @@ services:
     ports:
       - "8089:8089/udp"
     depends_on:
+      db-migrate:
+        condition: service_completed_successfully
       timescaledb:
         condition: service_healthy
 
@@ -45,6 +61,8 @@ services:
     ports:
       - "3000:3000"
     depends_on:
+      db-migrate:
+        condition: service_completed_successfully
       timescaledb:
         condition: service_healthy
 
