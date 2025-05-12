@@ -168,6 +168,54 @@ func (d *Database) GetAnomalies(query *models.TelemetryQuery) ([]models.AnomalyR
 	return records, totalCount, nil
 }
 
+func (d *Database) GetAggregatedTelemetry(query *models.TelemetryAggregationQuery) ([]models.AggregatedMetric, error) {
+	timeInterval := fmt.Sprintf("time_bucket('%s', timestamp)", query.GroupBy)
+
+	sqlQuery := fmt.Sprintf(`
+		SELECT 
+			%s as timestamp,
+			subsystem_id,
+			MIN(temperature) as min,
+			MAX(temperature) as max,
+			AVG(temperature) as avg,
+			COUNT(*) as count
+		FROM telemetry
+		WHERE timestamp BETWEEN $1 AND $2`, timeInterval)
+
+	args := []interface{}{query.StartTime, query.EndTime}
+	if query.SubsystemID != nil {
+		sqlQuery += " AND subsystem_id = $3"
+		args = append(args, *query.SubsystemID)
+	}
+
+	sqlQuery += fmt.Sprintf(" GROUP BY %s, subsystem_id ORDER BY timestamp DESC", timeInterval)
+
+	rows, err := d.db.Query(sqlQuery, args...)
+	if err != nil {
+		return nil, fmt.Errorf("error querying aggregated telemetry: %v", err)
+	}
+	defer rows.Close()
+
+	var metrics []models.AggregatedMetric
+	for rows.Next() {
+		var metric models.AggregatedMetric
+		err := rows.Scan(
+			&metric.Timestamp,
+			&metric.SubsystemID,
+			&metric.Min,
+			&metric.Max,
+			&metric.Avg,
+			&metric.Count,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning aggregated metric: %v", err)
+		}
+		metrics = append(metrics, metric)
+	}
+
+	return metrics, nil
+}
+
 func (d *Database) Close() error {
 	return d.db.Close()
 }

@@ -139,3 +139,28 @@ func (h *Handlers) GetAnomalies(c *fiber.Ctx) error {
 
 	return c.JSON(response)
 }
+
+func (h *Handlers) GetAggregates(c *fiber.Ctx) error {
+	query := new(models.TelemetryAggregationQuery)
+
+	if err := c.QueryParser(query); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid query parameters",
+		})
+	}
+
+	metrics, err := h.db.GetAggregatedTelemetry(query)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to fetch aggregated telemetry",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"data": metrics,
+		"time_range": models.TimeRange{
+			Start: query.StartTime,
+			End:   query.EndTime,
+		},
+	})
+}
