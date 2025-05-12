@@ -116,7 +116,7 @@ Create a telemetry dashboard that:
 
 - [x] Database migrations: Implement migrations for storing telemetry data and managing schema evolution
   - [x] Setting up the system and having one migration is acceptable
-- [ ] Observability: Use OpenTelemetry to instrument backend APIs and pipelines
+- [x] Observability: Use OpenTelemetry to instrument backend APIs and pipelines
   - [ ] Optional visualization using Grafana Tempo, Loki, Prometheus/Mimir
 - [ ] Integration test: Write integration tests to ensure the API correctly:
   - [ ] Serves telemetry data
