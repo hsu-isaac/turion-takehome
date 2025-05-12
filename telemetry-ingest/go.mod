@@ -3,7 +3,7 @@ module telemetry-ingest
 go 1.21.1
 
 require (
-	github.com/golang-migrate/migrate/v4 v4.17.0
+	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/lib/pq v1.10.9
 )
 
