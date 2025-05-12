@@ -45,40 +45,40 @@ type Anomaly struct {
 
 func (t *TelemetryPayload) ValidateTemperature() (bool, string) {
 	if t.Temperature > 35.0 {
-		return false, "High temperature anomaly"
+		return false, "high_temperature"
 	}
 	if t.Temperature < 20.0 || t.Temperature > 30.0 {
-		return false, "Temperature out of normal range"
+		return false, "low_temperature"
 	}
 	return true, ""
 }
 
 func (t *TelemetryPayload) ValidateBattery() (bool, string) {
 	if t.Battery < 40.0 {
-		return false, "Low battery anomaly"
+		return false, "low_battery"
 	}
 	if t.Battery < 70.0 || t.Battery > 100.0 {
-		return false, "Battery out of normal range"
+		return false, "low_battery"
 	}
 	return true, ""
 }
 
 func (t *TelemetryPayload) ValidateAltitude() (bool, string) {
 	if t.Altitude < 400.0 {
-		return false, "Low altitude anomaly"
+		return false, "low_altitude"
 	}
 	if t.Altitude < 500.0 || t.Altitude > 550.0 {
-		return false, "Altitude out of normal range"
+		return false, "low_altitude"
 	}
 	return true, ""
 }
 
 func (t *TelemetryPayload) ValidateSignal() (bool, string) {
 	if t.Signal < -80.0 {
-		return false, "Weak signal anomaly"
+		return false, "weak_signal"
 	}
 	if t.Signal < -60.0 || t.Signal > -40.0 {
-		return false, "Signal strength out of normal range"
+		return false, "weak_signal"
 	}
 	return true, ""
 }

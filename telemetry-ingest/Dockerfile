@@ -15,10 +15,17 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Build the application
-RUN go build -o telemetry-ingest ./cmd/server
+# Build both the main application and migration tool
+RUN go build -o telemetry-ingest ./cmd/server && \
+    go build -o migrate ./cmd/migrate
 
-# Run the application
+# Create a non-root user
+RUN adduser -D -g '' appuser
+
+# Switch to non-root user
+USER appuser
+
+# The default command will be overridden by docker-compose
 CMD ["./telemetry-ingest"]
 
 # Expose UDP port
