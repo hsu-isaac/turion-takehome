@@ -1,9 +1,13 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"telemetry-api/internal/models"
+	"time"
+
+	"telemetry-api/internal/observability"
 
 	_ "github.com/lib/pq"
 )
@@ -76,6 +80,9 @@ func (d *Database) GetTelemetry(query *models.TelemetryQuery) ([]models.Telemetr
 }
 
 func (d *Database) GetCurrentTelemetry() (*models.TelemetryRecord, error) {
+	ctx := context.Background()
+	start := time.Now()
+
 	query := `
 		SELECT timestamp, subsystem_id, temperature, battery, altitude, signal, has_anomaly
 		FROM telemetry
@@ -83,7 +90,7 @@ func (d *Database) GetCurrentTelemetry() (*models.TelemetryRecord, error) {
 		LIMIT 1`
 
 	var record models.TelemetryRecord
-	err := d.db.QueryRow(query).Scan(
+	err := d.db.QueryRowContext(ctx, query).Scan(
 		&record.Timestamp,
 		&record.SubsystemID,
 		&record.Temperature,
@@ -92,6 +99,10 @@ func (d *Database) GetCurrentTelemetry() (*models.TelemetryRecord, error) {
 		&record.Signal,
 		&record.HasAnomaly,
 	)
+
+	// Record metrics
+	observability.RecordDBQuery(ctx, "get_current_telemetry", time.Since(start), err)
+
 	if err != nil {
 		return nil, fmt.Errorf("error getting current telemetry: %v", err)
 	}
@@ -100,6 +111,9 @@ func (d *Database) GetCurrentTelemetry() (*models.TelemetryRecord, error) {
 }
 
 func (d *Database) GetAnomalies(query *models.TelemetryQuery) ([]models.AnomalyRecord, int, error) {
+	ctx := context.Background()
+	start := time.Now()
+
 	baseQuery := `
 		WITH results AS (
 			SELECT timestamp, subsystem_id, anomaly_type, value, expected_range,
@@ -122,8 +136,9 @@ func (d *Database) GetAnomalies(query *models.TelemetryQuery) ([]models.AnomalyR
 		SELECT timestamp, subsystem_id, anomaly_type, value, expected_range, total_count
 		FROM results`
 
-	rows, err := d.db.Query(baseQuery, args...)
+	rows, err := d.db.QueryContext(ctx, baseQuery, args...)
 	if err != nil {
+		observability.RecordDBQuery(ctx, "get_anomalies", time.Since(start), err)
 		return nil, 0, fmt.Errorf("error querying anomalies: %v", err)
 	}
 	defer rows.Close()
@@ -141,10 +156,14 @@ func (d *Database) GetAnomalies(query *models.TelemetryQuery) ([]models.AnomalyR
 			&totalCount,
 		)
 		if err != nil {
+			observability.RecordDBQuery(ctx, "get_anomalies_scan", time.Since(start), err)
 			return nil, 0, fmt.Errorf("error scanning anomaly record: %v", err)
 		}
 		records = append(records, record)
 	}
+
+	// Record successful query metrics
+	observability.RecordDBQuery(ctx, "get_anomalies", time.Since(start), nil)
 
 	return records, totalCount, nil
 }

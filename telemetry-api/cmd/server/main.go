@@ -6,6 +6,8 @@ import (
 	"os"
 	"telemetry-api/internal/database"
 	"telemetry-api/internal/handlers"
+	"telemetry-api/internal/middleware"
+	"telemetry-api/internal/observability"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -17,6 +19,12 @@ import (
 func main() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.Lshortfile)
 	log.Println("Starting telemetry API service...")
+
+	cleanup, err := observability.Setup()
+	if err != nil {
+		log.Fatalf("Failed to initialize tracing: %v", err)
+	}
+	defer cleanup()
 
 	db, err := database.NewDatabase(
 		os.Getenv("DB_HOST"),
@@ -43,20 +51,17 @@ func main() {
 		},
 	})
 
+	// Add middleware
 	app.Use(cors.New())
+	app.Use(middleware.TracingMiddleware())
 	app.Use(logger.New(logger.Config{
-		Format:     "${time} ${ip} ${method} ${path} ${status} ${latency}\n",
+		Format:     "${time} ${method} ${path} ${status} ${latency}\n",
 		TimeFormat: "2006-01-02 15:04:05",
 		TimeZone:   "Local",
-		Output:     os.Stdout,
 	}))
 
 	api := app.Group("/api/v1")
-
-	api.Get("/telemetry", func(c *fiber.Ctx) error {
-		log.Printf("Received telemetry request: %s", c.OriginalURL())
-		return h.GetTelemetry(c)
-	})
+	api.Get("/telemetry", h.GetTelemetry)
 	api.Get("/telemetry/current", h.GetCurrentTelemetry)
 	api.Get("/telemetry/anomalies", h.GetAnomalies)
 
