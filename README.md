@@ -54,37 +54,37 @@ That's all you need to know to get started!
 #### Requirements
 
 1. Create a service that:
-   - Listens for UDP packets containing spacecraft telemetry
-   - Decodes CCSDS-formatted packets according to provided structure
-   - Validates telemetry values against defined ranges:
-     - Temperature: 20.0°C to 30.0°C (normal), >35.0°C (anomaly)
-     - Battery: 70-100% (normal), <40% (anomaly)
-     - Altitude: 500-550km (normal), <400km (anomaly)
-     - Signal Strength: -60 to -40dB (normal), <-80dB (anomaly)
-   - Persists data to a database (Timescale or PostgreSQL preferred but not required)
-   - Implements an alerting mechanism for out-of-range values (Anomalies)
+   - [x] Listens for UDP packets containing spacecraft telemetry
+   - [x] Decodes CCSDS-formatted packets according to provided structure
+   - [x] Validates telemetry values against defined ranges:
+     - [x] Temperature: 20.0°C to 30.0°C (normal), >35.0°C (anomaly)
+     - [x] Battery: 70-100% (normal), <40% (anomaly)
+     - [x] Altitude: 500-550km (normal), <400km (anomaly)
+     - [x] Signal Strength: -60 to -40dB (normal), <-80dB (anomaly)
+   - [x] Persists data to a database (Timescale or PostgreSQL preferred but not required)
+   - [x] Implements an alerting mechanism for out-of-range values (Anomalies)
 
 ### Part 2: Telemetry API Service (Required)
 
 #### Requirements
 
 1. Create a REST API using:
-   - Fiber/Echo (Go)
-   - FastAPI (Python)
-   - Express/Fastify (TypeScript)
+   - [x] Fiber/Echo (Go)
+   - [ ] ~~FastAPI (Python)~~
+   - [ ] ~~Express/Fastify (TypeScript)~~
 
 #### API Endpoints (Minimum Required)
 
-- `GET /api/v1/telemetry`
-  - Query Parameters:
-    - `start_time` (ISO8601)
-    - `end_time` (ISO8601)
-- `GET /api/v1/telemetry/current`
-  - Returns latest telemetry values
-- `GET /api/v1/telemetry/anomalies`
-  - Query Parameters:
-    - `start_time` (ISO8601)
-    - `end_time` (ISO8601)
+- [x] `GET /api/v1/telemetry`
+  - [x] Query Parameters:
+    - [x] `start_time` (ISO8601)
+    - [x] `end_time` (ISO8601)
+- [x] `GET /api/v1/telemetry/current`
+  - [x] Returns latest telemetry values
+- [x] `GET /api/v1/telemetry/anomalies`
+  - [x] Query Parameters:
+    - [x] `start_time` (ISO8601)
+    - [x] `end_time` (ISO8601)
 
 ### Part 3: Front End Implementation
 
@@ -92,49 +92,49 @@ That's all you need to know to get started!
 
 Create a telemetry dashboard that:
 
-- Real-time updates: Display the most recent telemetry values in real time
-- Historical graphs or tables: Show historical telemetry data
-- Anomaly notifications: Provide real-time anomaly notifications
+- [x] Real-time updates: Display the most recent telemetry values in real time
+- [x] Historical graphs or tables: Show historical telemetry data
+- [x] Anomaly notifications: Provide real-time anomaly notifications
 
 #### Technical Requirements
 
-- Use React (You can use another front end tool if you do not understand React)
+- [x] Use React (You can use another front end tool if you do not understand React)
 
 ### Optional Requirements
 
 #### Frontend-Focused Optional Requirements
 
-- Error handling: Implement basic error handling and loading states
-- Responsive design: Ensure the dashboard works on desktop and mobile
-- User experience: Add features like:
-  - Search/filter for telemetry data
-  - Dark mode
-  - Theming
-- Telemetry visualization: Include charts for telemetry metrics (embedded Grafana is acceptable)
+- [x] Error handling: Implement basic error handling and loading states
+- [x] Responsive design: Ensure the dashboard works on desktop and mobile
+- [x] User experience: Add features like:
+  - [x] Search/filter for telemetry data
+  - [x] Dark mode
+  - [x] Theming
+- [ ] Telemetry visualization: Include charts for telemetry metrics (embedded Grafana is acceptable)
 
 #### Backend-Focused Optional Requirements
 
-- Database migrations: Implement migrations for storing telemetry data and managing schema evolution
-  - Setting up the system and having one migration is acceptable
-- Observability: Use OpenTelemetry to instrument backend APIs and pipelines
-  - Optional visualization using Grafana Tempo, Loki, Prometheus/Mimir
-- Integration test: Write integration tests to ensure the API correctly:
-  - Serves telemetry data
-  - Handles edge cases (e.g., real-time updates, data gaps)
-- Performance testing: Include performance benchmarks for:
-  - Real-time update pipelines
-  - Historical queries
+- [x] Database migrations: Implement migrations for storing telemetry data and managing schema evolution
+  - [x] Setting up the system and having one migration is acceptable
+- [ ] Observability: Use OpenTelemetry to instrument backend APIs and pipelines
+  - [ ] Optional visualization using Grafana Tempo, Loki, Prometheus/Mimir
+- [ ] Integration test: Write integration tests to ensure the API correctly:
+  - [ ] Serves telemetry data
+  - [ ] Handles edge cases (e.g., real-time updates, data gaps)
+- [ ] Performance testing: Include performance benchmarks for:
+  - [ ] Real-time update pipelines
+  - [ ] Historical queries
 
 ### Bonus Points
 
-- Docker Compose: Provide a working Docker Compose file for local development with all dependencies:
-  - Frontend
-  - Backend
-  - Database
-  - Observability tools
-- Comprehensive tests:
-  - Unit tests
-  - Integration tests
-  - End-to-end tests
-- Performance testing results: Provide evidence of load testing or benchmarking
-  - Using tools like JMeter, k6, or Locust
+- [x] Docker Compose: Provide a working Docker Compose file for local development with all dependencies:
+  - [x] Frontend
+  - [x] Backend
+  - [x] Database
+  - [ ] Observability tools
+- [ ] Comprehensive tests:
+  - [ ] Unit tests
+  - [ ] Integration tests
+  - [ ] End-to-end tests
+- [ ] Performance testing results: Provide evidence of load testing or benchmarking
+  - [ ] Using tools like JMeter, k6, or Locust
