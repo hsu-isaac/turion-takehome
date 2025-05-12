@@ -16,13 +16,21 @@ git clone https://github.com/hsu-isaac/turion-takehome.git
 cd turion-takehome
 ```
 
-2. Start all services using Docker Compose:
+2. Set up environment variables:
+
+```bash
+# Copy the frontend environment example file
+cp telemetry-frontend/.env.example telemetry-frontend/.env
+# Edit .env file with your specific configuration if needed
+```
+
+3. Start all services using Docker Compose:
 
 ```bash
 docker-compose up
 ```
 
-3. Access the services:
+4. Access the services:
 
 - Frontend Dashboard: http://localhost:3001
 - API Service: http://localhost:8080
