@@ -29,10 +29,6 @@ func main() {
 	}
 	defer db.Close()
 
-	if err := db.InitializeTables(); err != nil {
-		log.Fatalf("Failed to initialize database tables: %v", err)
-	}
-
 	addr, err := net.ResolveUDPAddr("udp", UDP_PORT)
 	if err != nil {
 		log.Fatalf("Failed to resolve UDP address: %v", err)

@@ -10,28 +10,23 @@ import (
 )
 
 var (
-	// Request metrics
 	requestCounter  metric.Int64Counter
 	requestDuration metric.Float64Histogram
 	errorCounter    metric.Int64Counter
 
-	// Database metrics
 	dbQueryCounter  metric.Int64Counter
 	dbQueryDuration metric.Float64Histogram
 	dbErrorCounter  metric.Int64Counter
 
-	// Telemetry metrics
 	telemetryCounter metric.Int64Counter
 	anomalyCounter   metric.Int64Counter
 )
 
-// InitializeMetrics sets up all our metrics
 func InitializeMetrics() error {
 	meter := otel.GetMeterProvider().Meter("telemetry-api")
 
 	var err error
 
-	// Request metrics
 	requestCounter, err = meter.Int64Counter(
 		"http.requests.total",
 		metric.WithDescription("Total number of HTTP requests"),
@@ -59,7 +54,6 @@ func InitializeMetrics() error {
 		return err
 	}
 
-	// Database metrics
 	dbQueryCounter, err = meter.Int64Counter(
 		"db.queries.total",
 		metric.WithDescription("Total number of database queries"),
@@ -87,7 +81,6 @@ func InitializeMetrics() error {
 		return err
 	}
 
-	// Telemetry metrics
 	telemetryCounter, err = meter.Int64Counter(
 		"telemetry.records.total",
 		metric.WithDescription("Total number of telemetry records processed"),
@@ -109,7 +102,6 @@ func InitializeMetrics() error {
 	return nil
 }
 
-// RecordRequest records metrics for an HTTP request
 func RecordRequest(ctx context.Context, method, path string, status int, duration time.Duration) {
 	attrs := []attribute.KeyValue{
 		attribute.String("method", method),
@@ -125,7 +117,6 @@ func RecordRequest(ctx context.Context, method, path string, status int, duratio
 	}
 }
 
-// RecordDBQuery records metrics for a database query
 func RecordDBQuery(ctx context.Context, queryType string, duration time.Duration, err error) {
 	attrs := []attribute.KeyValue{
 		attribute.String("query_type", queryType),
@@ -139,7 +130,6 @@ func RecordDBQuery(ctx context.Context, queryType string, duration time.Duration
 	}
 }
 
-// RecordTelemetry records metrics for telemetry processing
 func RecordTelemetry(ctx context.Context, hasAnomaly bool) {
 	telemetryCounter.Add(ctx, 1)
 	if hasAnomaly {

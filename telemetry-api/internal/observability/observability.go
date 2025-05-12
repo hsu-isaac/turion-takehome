@@ -15,7 +15,6 @@ import (
 )
 
 func Setup() (func(), error) {
-	// Create stdout exporters for both traces and metrics
 	traceExporter, err := stdouttrace.New(
 		stdouttrace.WithPrettyPrint(),
 	)
@@ -30,18 +29,15 @@ func Setup() (func(), error) {
 		return nil, err
 	}
 
-	// Create a TracerProvider
 	tp := sdktrace.NewTracerProvider(
 		sdktrace.WithBatcher(traceExporter),
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
 	)
 
-	// Create a MeterProvider
 	mp := sdkmetric.NewMeterProvider(
 		sdkmetric.WithReader(sdkmetric.NewPeriodicReader(metricExporter)),
 	)
 
-	// Set global providers
 	otel.SetTracerProvider(tp)
 	otel.SetMeterProvider(mp)
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
@@ -49,17 +45,14 @@ func Setup() (func(), error) {
 		propagation.Baggage{},
 	))
 
-	// Initialize metrics
 	if err := InitializeMetrics(); err != nil {
 		return nil, err
 	}
 
-	// Return cleanup function
 	return func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		// Shutdown both providers
 		if err := tp.Shutdown(ctx); err != nil {
 			log.Printf("Error shutting down tracer: %v", err)
 		}

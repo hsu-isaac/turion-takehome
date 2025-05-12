@@ -28,58 +28,6 @@ func NewDatabase(host string, port int, user, password, dbname string) (*Databas
 	return &Database{db: db}, nil
 }
 
-func (d *Database) InitializeTables() error {
-	_, err := d.db.Exec(`
-		CREATE TABLE IF NOT EXISTS telemetry (
-			timestamp TIMESTAMPTZ NOT NULL,
-			subsystem_id SMALLINT NOT NULL,
-			temperature FLOAT NOT NULL,
-			battery FLOAT NOT NULL,
-			altitude FLOAT NOT NULL,
-			signal FLOAT NOT NULL,
-			has_anomaly BOOLEAN NOT NULL
-		);
-	`)
-	if err != nil {
-		return fmt.Errorf("error creating telemetry table: %v", err)
-	}
-
-	_, err = d.db.Exec(`
-		SELECT create_hypertable('telemetry', 'timestamp', 
-			chunk_time_interval => INTERVAL '1 hour',
-			if_not_exists => TRUE
-		);
-	`)
-	if err != nil {
-		return fmt.Errorf("error creating hypertable: %v", err)
-	}
-
-	_, err = d.db.Exec(`
-		CREATE TABLE IF NOT EXISTS anomalies (
-			timestamp TIMESTAMPTZ NOT NULL,
-			subsystem_id SMALLINT NOT NULL,
-			anomaly_type TEXT NOT NULL,
-			value FLOAT NOT NULL,
-			expected_range TEXT NOT NULL
-		);
-	`)
-	if err != nil {
-		return fmt.Errorf("error creating anomalies table: %v", err)
-	}
-
-	_, err = d.db.Exec(`
-		SELECT create_hypertable('anomalies', 'timestamp',
-			chunk_time_interval => INTERVAL '1 hour',
-			if_not_exists => TRUE
-		);
-	`)
-	if err != nil {
-		return fmt.Errorf("error creating anomalies hypertable: %v", err)
-	}
-
-	return nil
-}
-
 func (d *Database) StoreTelemetry(record *models.TelemetryRecord) error {
 	_, err := d.db.Exec(`
 		INSERT INTO telemetry (

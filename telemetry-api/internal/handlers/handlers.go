@@ -30,7 +30,6 @@ func (h *Handlers) GetTelemetry(c *fiber.Ctx) error {
 		})
 	}
 
-	// Only set defaults if not provided or invalid
 	if query.Page <= 0 {
 		query.Page = 1
 	}
@@ -38,7 +37,6 @@ func (h *Handlers) GetTelemetry(c *fiber.Ctx) error {
 		query.PageSize = 20
 	}
 
-	// Set default subsystem ID if not provided
 	if query.SubsystemID == nil {
 		defaultID := uint16(1)
 		query.SubsystemID = &defaultID
@@ -98,7 +96,6 @@ func (h *Handlers) GetAnomalies(c *fiber.Ctx) error {
 		})
 	}
 
-	// Only set defaults if not provided or invalid
 	if query.Page <= 0 {
 		query.Page = 1
 	}
@@ -106,7 +103,6 @@ func (h *Handlers) GetAnomalies(c *fiber.Ctx) error {
 		query.PageSize = 20
 	}
 
-	// Set default subsystem ID if not provided
 	if query.SubsystemID == nil {
 		defaultID := uint16(1)
 		query.SubsystemID = &defaultID

@@ -100,7 +100,6 @@ func (d *Database) GetCurrentTelemetry() (*models.TelemetryRecord, error) {
 		&record.HasAnomaly,
 	)
 
-	// Record metrics
 	observability.RecordDBQuery(ctx, "get_current_telemetry", time.Since(start), err)
 
 	if err != nil {
@@ -162,7 +161,6 @@ func (d *Database) GetAnomalies(query *models.TelemetryQuery) ([]models.AnomalyR
 		records = append(records, record)
 	}
 
-	// Record successful query metrics
 	observability.RecordDBQuery(ctx, "get_anomalies", time.Since(start), nil)
 
 	return records, totalCount, nil

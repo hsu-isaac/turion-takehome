@@ -51,7 +51,6 @@ func main() {
 		},
 	})
 
-	// Add middleware
 	app.Use(cors.New())
 	app.Use(middleware.TracingMiddleware())
 	app.Use(logger.New(logger.Config{
