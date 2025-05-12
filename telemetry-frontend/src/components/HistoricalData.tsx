@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -146,7 +146,7 @@ const HistoricalData: React.FC = () => {
     };
   }, [telemetryData]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!startDate || !endDate) return;
 
     setIsLoading(true);
@@ -176,17 +176,17 @@ const HistoricalData: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [startDate, endDate, currentPage]);
 
   useEffect(() => {
     setCurrentPage(1);
     setCurrentPageSort(null);
     fetchData();
-  }, [startDate, endDate]);
+  }, [startDate, endDate, fetchData]);
 
   useEffect(() => {
     fetchData();
-  }, [currentPage]);
+  }, [currentPage, fetchData]);
 
   const handleSort = (key: keyof TelemetryRecord) => {
     setCurrentPageSort((current) => ({

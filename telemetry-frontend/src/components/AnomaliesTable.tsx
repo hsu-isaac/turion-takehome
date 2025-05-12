@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { TelemetryService } from "../services/telemetryService";
-import { AnomalyRecord, TelemetryResponse } from "../types/telemetry";
+import { AnomalyRecord } from "../types/telemetry";
 import DateRangeSelector from "./shared/DateRangeSelector";
 import DataTable from "./shared/DataTable";
+import { getAnomalyDisplayName } from "../utils/anomalyTypes";
 
 const ITEMS_PER_PAGE = 10;
 const telemetryService = new TelemetryService();
@@ -64,7 +65,7 @@ const AnomaliesTable: React.FC = () => {
     });
   }, [anomalies, currentPageSort]);
 
-  const fetchAnomalies = async () => {
+  const fetchAnomalies = useCallback(async () => {
     if (!startDate || !endDate) return;
 
     setLoading(true);
@@ -91,17 +92,17 @@ const AnomaliesTable: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [startDate, endDate, currentPage]);
 
   useEffect(() => {
     setCurrentPage(1);
     setCurrentPageSort(null);
     fetchAnomalies();
-  }, [startDate, endDate]);
+  }, [startDate, endDate, fetchAnomalies]);
 
   useEffect(() => {
     fetchAnomalies();
-  }, [currentPage]);
+  }, [currentPage, fetchAnomalies]);
 
   const handleQuickSelect = (hours: number) => {
     const end = new Date();
@@ -148,7 +149,8 @@ const AnomaliesTable: React.FC = () => {
       key: "anomaly_type" as keyof AnomalyRecord,
       header: "Metric",
       sortable: true,
-      render: (value: string | number | boolean) => value as string,
+      render: (value: string | number | boolean) =>
+        getAnomalyDisplayName(value as string),
     },
     {
       key: "value" as keyof AnomalyRecord,
